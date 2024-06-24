@@ -1,0 +1,100 @@
+body {
+  background-color: #2d2d2d;
+  color: #ffffff;
+  font-family: 'Arial', sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+}
+
+.App {
+  text-align: center;
+}
+
+.App-header {
+  background-color: #2d2d2d;
+  padding: 40px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  max-width: 100%;
+  margin: auto;
+}
+
+.App-header h1 {
+  font-size: 5em;
+  margin: 0;
+}
+
+.App-header p {
+  font-size: 2em;
+  margin: 0;
+  margin-bottom: 20px;
+}
+
+table {
+  width: 100%;
+  margin: 20px 0;
+  border-collapse: collapse;
+}
+
+table, th, td {
+  border: 1px solid #ffffff;
+}
+
+th, td {
+  padding: 16px;
+  text-align: center;
+  word-wrap: break-word; /* Allows wrapping of long text */
+}
+
+th {
+  background-color: #4caf50;
+  color: white;
+}
+
+td {
+  background-color: #3e3e3e;
+  font-size: 1.1em;
+  max-width: 9000px; /* Ensures the column is wide enough for the timestamp */
+}
+
+.button-container {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.button-container {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.button-container button {
+  width: 200px; /* Tăng kích thước nút */
+  height: 50px; /* Tăng kích thước nút */
+  border-radius: 25px; /* Bo tròn viền */
+  border: none;
+  color: white;
+  font-size: 20px; /* Tăng kích thước font chữ */
+  font-size: 16px;
+  font-weight: bold; /* In đậm chữ */
+  cursor: pointer;
+  margin-top: 10px; /* Tạo khoảng cách giữa các nút */
+}
+
+.close-button {
+  background-color: red;
+}
+
+.open-button {
+  background-color: green;
+}
+
+.button-container button:hover {
+  opacity: 0.8;
+}
