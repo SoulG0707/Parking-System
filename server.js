@@ -1,129 +1,144 @@
-var express = require("express");
-var bodyParser = require("body-parser");
-var cors = require("cors");
-var mysql = require("mysql2"); //npm install mysql2
-var app = express();
+const express = require("express");
+const bodyParser = require("body-parser");
+const cors = require("cors");
+const mysql = require("mysql2");
+
+const app = express();
+const PORT = 7777;
+
+// Sử dụng middleware
 app.use(cors());
 app.use(bodyParser.json());
 
-var con = mysql.createConnection({
+// Kết nối CSDL MySQL
+const con = mysql.createConnection({
   host: "localhost",
   port: "3306",
   user: "root",
-  password: "Ptyn07072004_",
-  insecureAuth: true,
+  password: "Ptyn07072004_", // Thay đổi thành mật khẩu MySQL của bạn
   database: "Parking_System",
 });
 
-con.connect(function (err) {
-  if (err) throw err;
-  console.log("Connected!!!");
-  var sql = "SELECT * FROM lightsensor";
-  con.query(sql, function (err, results) {
-    if (err) throw err;
-    console.log(results);
+// Kiểm tra kết nối tới CSDL
+con.connect((err) => {
+  if (err) {
+    console.error("Lỗi kết nối CSDL:", err.stack);
+    return;
+  }
+  console.log("Đã kết nối tới CSDL MySQL!");
+
+  // Truy vấn ban đầu để kiểm tra kết nối
+  const sql = "SELECT * FROM lightsensor";
+  con.query(sql, (err, results) => {
+    if (err) {
+      console.error("Lỗi truy vấn CSDL:", err.stack);
+      return;
+    }
+    console.log("Dữ liệu ban đầu từ bảng lightsensor:", results);
   });
 });
 
-app.get("/get", function (req, res) {
+// Route lấy tất cả dữ liệu từ bảng lightsensor
+app.get("/get", (req, res) => {
   const sql = "SELECT * FROM lightsensor";
-  con.query(sql, function (err, results) {
+  con.query(sql, (err, results) => {
     if (err) {
-      console.error(err);
-      return res.status(500).send("Database error!");
+      console.error("Lỗi truy vấn CSDL:", err.stack);
+      return res.status(500).send("Lỗi CSDL!");
     }
     res.json(results);
   });
 });
 
-app.get("/get/:id", function (req, res) {
+// Route lấy dữ liệu từ lightsensor theo ID
+app.get("/get/:id", (req, res) => {
   const { id } = req.params;
   const sql = "SELECT * FROM lightsensor WHERE id = ?";
-  console.log(sql);
-
-  con.query(sql, [id], function (err, results) {
+  con.query(sql, [id], (err, results) => {
     if (err) {
-      console.error(err);
-      return res.status(500).send("Database error!");
+      console.error("Lỗi truy vấn CSDL:", err.stack);
+      return res.status(500).send("Lỗi CSDL!");
     }
     if (results.length === 0) {
-      return res.status(404).send("Record not found!");
+      return res.status(404).send("Không tìm thấy bản ghi!");
     }
     res.json(results[0]);
   });
 });
 
-app.post("/add", function (req, res) {
+// Route thêm dữ liệu mới vào lightsensor
+app.post("/add", (req, res) => {
   const { status, atTime } = req.body;
-  console.log("Received data:", req.body);
+  if (!status || !atTime) {
+    return res.status(400).send("Thiếu tham số: status hoặc atTime");
+  }
   const sql = "INSERT INTO lightsensor (status, atTime) VALUES (?, ?)";
-  console.log(sql);
-  con.query(sql, [status, atTime], function (err, results) {
+  con.query(sql, [status, atTime], (err, results) => {
     if (err) {
-      console.error("Error while inserting:", err);
-      return res.status(500).send("Database error!");
+      console.error("Lỗi khi thêm vào CSDL:", err.stack);
+      return res.status(500).send("Lỗi CSDL!");
     }
-    res.send("Add success!");
+    res.send("Thêm dữ liệu thành công!");
   });
 });
 
-app.put("/update/:id", function (req, res) {
+// Route cập nhật dữ liệu trong lightsensor theo ID
+app.put("/update/:id", (req, res) => {
   const { id } = req.params;
   const { status, atTime } = req.body;
+  if (!status || !atTime) {
+    return res.status(400).send("Thiếu tham số: status hoặc atTime");
+  }
   const sql = "UPDATE lightsensor SET status = ?, atTime = ? WHERE id = ?";
-  console.log(sql);
-
-  con.query(sql, [status, atTime, id], function (err, results) {
+  con.query(sql, [status, atTime, id], (err, results) => {
     if (err) {
-      console.error(err);
-      return res.status(500).send("Database error!");
+      console.error("Lỗi khi cập nhật CSDL:", err.stack);
+      return res.status(500).send("Lỗi CSDL!");
     }
     if (results.affectedRows === 0) {
-      return res.status(404).send("Record not found!");
+      return res.status(404).send("Không tìm thấy bản ghi!");
     }
-    res.send("Update success!");
+    res.send("Cập nhật dữ liệu thành công!");
   });
 });
 
-app.delete("/delete/:id", function (req, res) {
+// Route xóa dữ liệu từ lightsensor theo ID
+app.delete("/delete/:id", (req, res) => {
   const { id } = req.params;
   const sql = "DELETE FROM lightsensor WHERE id = ?";
-  console.log(sql);
-
-  con.query(sql, [id], function (err, results) {
+  con.query(sql, [id], (err, results) => {
     if (err) {
-      console.error(err);
-      return res.status(500).send("Database error!");
+      console.error("Lỗi khi xóa từ CSDL:", err.stack);
+      return res.status(500).send("Lỗi CSDL!");
     }
     if (results.affectedRows === 0) {
-      return res.status(404).send("Record not found!");
+      return res.status(404).send("Không tìm thấy bản ghi!");
     }
-    res.send("Delete success!");
+    res.send("Xóa dữ liệu thành công!");
   });
 });
 
-// Biến toàn cục để lưu trạng thái cửa
+// Endpoint quản lý trạng thái cửa
 let doorStatus = "closed";
 
-// Endpoint để xử lý mở/đóng cửa
-app.post("/door", function (req, res) {
+// Route thay đổi trạng thái cửa
+app.post("/door/status", (req, res) => {
   const { action } = req.body;
   if (action === "open" || action === "close") {
     doorStatus = action;
-    console.log(`Door ${action}`);
-    res.send(`Door ${action}`);
+    console.log(`Cửa được ${action}`);
+    res.send(`Cửa được ${action}`);
   } else {
-    res.status(400).send("Invalid action");
+    res.status(400).send("Hành động không hợp lệ");
   }
 });
 
-// Endpoint để kiểm tra trạng thái cửa
-app.get("/door/status", function (req, res) {
+// Route lấy trạng thái cửa
+app.get("/door/status", (req, res) => {
   res.json({ action: doorStatus });
 });
 
-var server = app.listen(7777, function () {
-  var host = server.address().address;
-  var port = server.address().port;
-  console.log("Server is listening at http://%s:%s", host, port);
+// Khởi động server
+app.listen(PORT, () => {
+  console.log(`Server đang lắng nghe tại http://localhost:${PORT}`);
 });
